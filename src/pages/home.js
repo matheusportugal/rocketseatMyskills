@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
+    FlatList,
     StyleSheet,
     Text,
     TextInput,
@@ -11,40 +12,58 @@ import { SkillCard } from '../components/SkillCard';
 export function Home() {
     const [newSkill, setNewSkill] = useState('');
     const [mySkills, setMySkills] = useState([]);
+    const [greeting, setGreeting] = useState('');
 
     function handleAddNewSkill() {
         setMySkills(oldState => [...oldState, newSkill]);
     }
 
+    useEffect(() => {
+        const currentHour = new Date().getHours();
+
+        if (currentHour < 12) {
+            setGreeting('Good Morning');
+        } else if (currentHour >= 12 && currentHour < 18) {
+            setGreeting('Good Afternoon');
+        } else {
+            setGreeting('Good Evening');
+        }
+    }, []);
+
     return (
-        <>
-            <View style={styles.container}>
-                <Text style={styles.title}>
-                    Welcome, Matheus
+        <View style={styles.container}>
+
+            <Text style={styles.title}>
+                Welcome, Matheus
                     </Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="New Skill"
-                    placeholderTextColor="#555"
-                    onChangeText={setNewSkill}
-                />
 
-                <Button onPress={handleAddNewSkill} />
+            <Text style={styles.greetings}>
+                {greeting}
+            </Text>
+            <TextInput
+                style={styles.input}
+                placeholder="New Skill"
+                placeholderTextColor="#555"
+                onChangeText={setNewSkill}
+            />
 
+            <Button onPress={handleAddNewSkill} />
+
+            { mySkills.length > 0 &&
                 <Text style={[styles.title, styles.mySkillsTitle]}>
                     My Skills
                 </Text>
+            }
 
-                {
-                    mySkills.map(skill => (
-                        <SkillCard skill={skill} />
-                    ))
+            <FlatList
+                data={mySkills}
+                keyExtractor={item => item}
+                renderItem={({ item }) => (
+                    <SkillCard skill={item} />
+                )}
+            />
 
-                }
-
-            </View>
-
-        </>
+        </View>
     )
 }
 
@@ -56,7 +75,7 @@ const styles = StyleSheet.create({
         paddingVertical: 70
     },
     title: {
-        color: '#fff',
+        color: '#FFF',
         fontSize: 24,
         fontWeight: 'bold'
     },
@@ -71,5 +90,8 @@ const styles = StyleSheet.create({
     mySkillsTitle: {
         marginVertical: 50
     },
+    greetings: {
+        color: '#FFF'
+    }
 
 });
